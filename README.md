@@ -1,4 +1,4 @@
-### ⚾ MLB 賽事勝率預測與 2025 賽季模擬系統
+# ⚾ MLB 賽事勝率預測與 2025 賽季模擬系統
 (MLB Win Probability Predictor & Season Simulator)
 這是一個整合 機器學習 (Machine Learning)、深度學習 (Deep Learning) 與 賽伯計量學 (Sabermetrics) 的全端預測系統。
 本專案利用 2013 至 2024 年的 MLB 歷史數據（包含比賽結果、球隊數據、投手數據），訓練出能預測單場比賽勝率的模型，並透過 蒙地卡羅方法 (Monte Carlo Simulation) 模擬符合真實賽制的 162 場例行賽與季後賽，最終預測 2025 年的世界大賽冠軍。
