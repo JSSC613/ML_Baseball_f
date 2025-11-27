@@ -1,0 +1,11 @@
+# 忽略 Python 編譯產生的垃圾檔
+__pycache__/
+*.pyc
+
+# 忽略虛擬環境資料夾
+.venv/
+env/
+
+# 忽略大於 100MB 的模型檔
+*.h5
+models/*.h5
