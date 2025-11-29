@@ -102,7 +102,7 @@ def load_and_process_data():
         # 填補剩餘缺失值
         df[['sp_era', 'sp_whip']] = df[['sp_era', 'sp_whip']].fillna(value={'sp_era': 4.50, 'sp_whip': 1.35})
     else:
-        print("⚠️ 警告：無法從 pitching.csv 提取數據，所有投手數據將為預設值。")
+        print(" 無法從 pitching.csv 提取數據，所有投手數據將為預設值。")
         df['sp_era'] = 4.50
         df['sp_whip'] = 1.35
 
@@ -144,11 +144,11 @@ def load_and_process_data():
     matchups = pd.merge(home_df, vis_df, left_on='home_gid', right_on='vis_gid')
     
     if len(matchups) == 0:
-        print("❌ 錯誤：合併後資料為空。")
+        print("合併後資料為空。")
     else:
         os.makedirs(os.path.dirname(PROCESSED_DATA_PATH), exist_ok=True)
         matchups.to_csv(PROCESSED_DATA_PATH, index=False)
-        print(f"✅ 資料處理完成！已儲存至 {PROCESSED_DATA_PATH}")
+        print(f"資料處理完成！已儲存至 {PROCESSED_DATA_PATH}")
         # 驗證投手數據是否有效 (不應該全是 4.5)
         era_std = matchups['home_sp_era'].std()
         print(f"主隊先發投手 ERA 標準差: {era_std:.4f} (若接近 0 代表數據有問題)")
