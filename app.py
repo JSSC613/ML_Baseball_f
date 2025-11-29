@@ -24,16 +24,16 @@ try:
     xgb_model = joblib.load(os.path.join(MODEL_DIR, 'xgb_model.pkl'))
     scaler = joblib.load(os.path.join(MODEL_DIR, 'scaler.pkl'))
     keras_model = tf.keras.models.load_model(os.path.join(MODEL_DIR, 'keras_model.h5'))
-    print("✅ 模型載入成功")
+    print(" 模型載入成功")
 except Exception as e:
-    print(f"❌ 模型載入錯誤: {e}")
+    print(f" 模型載入錯誤: {e}")
     print("請確保已執行 src/train_models.py")
 
 print("正在載入數據...")
 if os.path.exists(DATA_PATH):
     df = pd.read_csv(DATA_PATH)
 else:
-    print("❌ 找不到資料檔")
+    print(" 找不到資料檔")
     df = pd.DataFrame()
 
 # --- 2. 全局特徵工程 (補上缺少的特徵) ---
@@ -238,7 +238,7 @@ def simulate_season():
         
     if len(ws_teams) == 2:
         champion, w6, l6 = simulate_series(ws_teams[0], ws_teams[1], 4)
-        logs.append(f"\n🏆 世界大賽: {champion} def {ws_teams[0] if champion!=ws_teams[0] else ws_teams[1]} ({w6}-{l6})")
+        logs.append(f"\n 世界大賽: {champion} def {ws_teams[0] if champion!=ws_teams[0] else ws_teams[1]} ({w6}-{l6})")
         return champion, logs
     return "Error", logs
 
