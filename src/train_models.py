@@ -7,7 +7,6 @@ from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report
-# 修正這裡：補上 RandomizedSearchCV
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 import tensorflow as tf
 from keras.models import Sequential
@@ -23,12 +22,12 @@ if not os.path.exists(MODEL_DIR): os.makedirs(MODEL_DIR)
 def train():
     print("正在載入訓練資料...")
     if not os.path.exists(PROCESSED_DATA_PATH):
-        print("❌ 請先執行 data_processing.py")
+        print("請先執行 data_processing.py")
         return
         
     df = pd.read_csv(PROCESSED_DATA_PATH)
     
-    # --- 特徵工程 ---
+    # --- 特徵 ---
     # 確保分母不為 0
     df['home_pyth'] = (df['home_roll_b_r']**1.83) / ((df['home_roll_b_r']**1.83 + df['home_roll_p_r']**1.83) + 1e-9)
     df['vis_pyth'] = (df['vis_roll_b_r']**1.83) / ((df['vis_roll_b_r']**1.83 + df['vis_roll_p_r']**1.83) + 1e-9)
@@ -37,7 +36,7 @@ def train():
     df['diff_pyth'] = df['home_pyth'] - df['vis_pyth']
     df['diff_run_diff'] = (df['home_roll_b_r'] - df['home_roll_p_r']) - (df['vis_roll_b_r'] - df['vis_roll_p_r'])
     
-    # 確保投手欄位存在
+    # 確保投手欄位
     if 'home_sp_era' not in df.columns: df['home_sp_era'] = 4.5
     if 'vis_sp_era' not in df.columns: df['vis_sp_era'] = 4.5
     if 'home_sp_whip' not in df.columns: df['home_sp_whip'] = 1.35
@@ -46,7 +45,7 @@ def train():
     df['diff_sp_era'] = df['home_sp_era'] - df['vis_sp_era']
     df['diff_sp_whip'] = df['home_sp_whip'] - df['vis_sp_whip']
     
-    # 確保 EqA 欄位存在
+    # 確保 EqA 欄位
     if 'home_roll_b_eqa' not in df.columns: df['home_roll_b_eqa'] = 0.250
     if 'vis_roll_b_eqa' not in df.columns: df['vis_roll_b_eqa'] = 0.250
     
@@ -85,7 +84,7 @@ def train():
     joblib.dump(scaler, os.path.join(MODEL_DIR, 'scaler.pkl'))
     
     # --- 1. XGBoost (使用 RandomizedSearchCV 尋找最佳參數) ---
-    print("\n🚀 正在最佳化 XGBoost 參數 (這需要幾分鐘)...")
+    print("\n 正在最佳化 XGBoost 參數")
     
     xgb_param_dist = {
         'n_estimators': [100, 300, 500, 800],
@@ -114,23 +113,23 @@ def train():
     search.fit(X_train, y_train)
     best_xgb = search.best_estimator_
     
-    print(f"✅ XGBoost 最佳參數: {search.best_params_}")
-    print(f"✅ XGBoost 最佳驗證分數: {search.best_score_:.4f}")
+    print(f"XGBoost 最佳參數: {search.best_params_}")
+    print(f"XGBoost 最佳驗證分數: {search.best_score_:.4f}")
     
     y_pred_xgb = best_xgb.predict(X_test)
     acc_xgb = accuracy_score(y_test, y_pred_xgb)
-    print(f"🏆 XGBoost 測試集正確率: {acc_xgb:.4f}")
+    print(f"XGBoost 測試集正確率: {acc_xgb:.4f}")
     joblib.dump(best_xgb, os.path.join(MODEL_DIR, 'xgb_model.pkl'))
 
     # --- 2. Random Forest (簡單參數調整) ---
-    print("\n🌲 訓練 Random Forest...")
+    print("\n訓練 Random Forest...")
     rf = RandomForestClassifier(n_estimators=300, max_depth=12, min_samples_split=5, random_state=42)
     rf.fit(X_train, y_train)
     print(f"RF Accuracy: {accuracy_score(y_test, rf.predict(X_test)):.4f}")
     joblib.dump(rf, os.path.join(MODEL_DIR, 'rf_model.pkl'))
     
     # --- 3. Keras (深度學習優化版) ---
-    print("\n🧠 訓練 Keras Neural Network (優化版)...")
+    print("\n訓練 Keras Neural Network")
     # 加入 BatchNormalization 和 EarlyStopping 防止過擬合
     model = Sequential([
         Input(shape=(len(features),)),
@@ -163,7 +162,7 @@ def train():
     )
     
     _, acc_keras = model.evaluate(X_test_scaled, y_test, verbose=0)
-    print(f"🏆 Keras Accuracy: {acc_keras:.4f}")
+    print(f"Keras Accuracy: {acc_keras:.4f}")
     model.save(os.path.join(MODEL_DIR, 'keras_model.h5'))
     
     print("\n=== 訓練完成 ===")
